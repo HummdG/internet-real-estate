@@ -1,0 +1,98 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [btree_gist]
+}
+
+enum Currency {
+  USD
+  GBP
+}
+
+enum BlockStatus {
+  PENDING_PAYMENT
+  ACTIVE
+  LISTED
+  TRANSFERRED
+}
+
+enum TxType {
+  INITIAL_PURCHASE
+  RESALE
+}
+
+model PixelBlock {
+  id                     String      @id @default(cuid())
+  x                      Int
+  y                      Int
+  width                  Int
+  height                 Int
+  ownerEmail             String
+  editToken              String      @unique @default(uuid())
+  publicSlug             String      @unique @default(cuid())
+  imageKey               String?
+  linkUrl                String?
+  altText                String?
+  status                 BlockStatus @default(PENDING_PAYMENT)
+  stripeSessionId        String?     @unique
+  stripeConnectAccountId String?
+  currency               Currency
+  priceMinorUnit         Int
+  purchasedAt            DateTime?
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
+
+  listing      Listing?
+  transactions Transaction[]
+
+  @@index([status])
+  @@index([editToken])
+}
+
+model Listing {
+  id                String     @id @default(cuid())
+  pixelBlockId      String     @unique
+  pixelBlock        PixelBlock @relation(fields: [pixelBlockId], references: [id])
+  listingToken      String     @unique @default(uuid())
+  askPriceMinorUnit Int
+  currency          Currency
+  stripeOnboarded   Boolean    @default(false)
+  buyerEmail        String?
+  stripeSessionId   String?    @unique
+  listedAt          DateTime   @default(now())
+  soldAt            DateTime?
+  active            Boolean    @default(true)
+
+  @@index([active])
+}
+
+model Transaction {
+  id                    String     @id @default(cuid())
+  pixelBlockId          String
+  pixelBlock            PixelBlock @relation(fields: [pixelBlockId], references: [id])
+  type                  TxType
+  buyerEmail            String
+  sellerEmail           String?
+  amountMinorUnit       Int
+  platformFeeMinorUnit  Int?
+  currency              Currency
+  stripePaymentIntentId String?
+  completedAt           DateTime   @default(now())
+
+  @@index([pixelBlockId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  event     String
+  payload   Json
+  createdAt DateTime @default(now())
+
+  @@index([event])
+  @@index([createdAt])
+}
