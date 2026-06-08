@@ -4,8 +4,23 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { BlockMeta, buildPixelOwnerMap, getBlockAt, isRegionFree } from "@/lib/grid/blockIndex";
 import { GRID_SIZE } from "@/lib/grid/constants";
+import { countryByCode } from "@/lib/countries";
 import PurchaseModal from "@/components/modals/PurchaseModal";
 import BlockInfoModal from "@/components/modals/BlockInfoModal";
+
+interface PixelGridProps {
+  /** When set, all blocks tagged with this nation are tinted on the overlay. */
+  highlightCountry?: string | null;
+}
+
+// Convert a #rrggbb hex to an rgba() string at the given alpha.
+function hexToRgba(hex: string, alpha: number): string {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 interface GridData {
   masterImageUrl: string | null;
@@ -22,7 +37,7 @@ interface Selection {
 // Clamp a value between min and max
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
-export default function PixelGrid() {
+export default function PixelGrid({ highlightCountry }: PixelGridProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLCanvasElement>(null);
@@ -151,7 +166,7 @@ export default function PixelGrid() {
   const screenToGrid = useCallback(
     (sx: number, sy: number): { gx: number; gy: number } | null => {
       if (!containerRef.current) return null;
-      // containerRef is the inner moving div — getBoundingClientRect already includes pan offset
+      // containerRef is the inner moving div, getBoundingClientRect already includes pan offset
       const rect = containerRef.current.getBoundingClientRect();
       const localX = sx - rect.left;
       const localY = sy - rect.top;
@@ -200,11 +215,23 @@ export default function PixelGrid() {
 
     // Draw owned block outlines
     if (gridData.blocks.length > 0) {
+      const highlight = highlightCountry ? countryByCode[highlightCountry] : undefined;
+
       gridData.blocks.forEach((b) => {
         const bx = b.x * cellSize;
         const by = b.y * cellSize;
         const bw = b.width * cellSize;
         const bh = b.height * cellSize;
+
+        // Nation highlight: fill blocks repping the selected country.
+        if (highlight && b.country === highlightCountry) {
+          ctx.fillStyle = hexToRgba(highlight.primaryColor, 0.4);
+          ctx.fillRect(bx, by, bw, bh);
+          ctx.strokeStyle = "rgba(245,197,24,0.95)"; // gold
+          ctx.lineWidth = Math.max(1.5, cellSize * 0.12);
+          ctx.strokeRect(bx, by, bw, bh);
+          return;
+        }
 
         if (b.listed) {
           ctx.strokeStyle = "rgba(255,200,0,0.8)";
@@ -242,7 +269,7 @@ export default function PixelGrid() {
       ctx.strokeRect(px, py, pw, ph);
       ctx.setLineDash([]);
     }
-  }, [selectedPixels, gridData.blocks, cellSize, dragPreviewRect]);
+  }, [selectedPixels, gridData.blocks, cellSize, dragPreviewRect, highlightCountry]);
 
   // Magnifier constants
   const MAG_DISPLAY = 160; // canvas size in CSS px
@@ -520,7 +547,7 @@ export default function PixelGrid() {
         />
       </div>
 
-      {/* Magnifier bubble — shown when hovering and not actively selecting */}
+      {/* Magnifier bubble: shown when hovering and not actively selecting */}
       {hoverCell && !isSelecting.current && (
         <canvas
           ref={magnifierRef}
@@ -567,7 +594,7 @@ export default function PixelGrid() {
         </div>
       )}
 
-      {/* All controls portalled into the instruction bar — nothing overlays the grid */}
+      {/* All controls portalled into the instruction bar, nothing overlays the grid */}
       <BarPortals
         canUndo={canUndo}
         undo={undo}

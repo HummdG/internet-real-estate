@@ -184,7 +184,7 @@ export default function PixelEditor({
               textDecoration: "none",
             }}
           >
-            ← PIXEL ESTATE
+            ← THE FAN WALL
           </a>
           <span style={{ color: "#333" }}>|</span>
           <span style={{ fontSize: 11, color: "#555", letterSpacing: "0.1em" }}>

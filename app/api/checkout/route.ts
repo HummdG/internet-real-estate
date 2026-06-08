@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
           currency: currencyLower,
           unit_amount: 100, // $1 / £1 per pixel
           product_data: {
-            name: `${billedPixelCount.toLocaleString()} Pixels on Pixel Estate`,
+            name: `${billedPixelCount.toLocaleString()} Pixels on The Fan Wall`,
             description: `${block.width}×${block.height} block at (${block.x}, ${block.y})`,
           },
         },

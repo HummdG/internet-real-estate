@@ -13,6 +13,7 @@ export interface BlockMeta {
   listed: boolean;
   listingPrice?: number;
   listingCurrency?: string;
+  country: string | null;
 }
 
 /**

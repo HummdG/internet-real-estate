@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
+import { countryZodEnum } from "@/lib/countries";
 
 const schema = z.object({
   listingId: z.string().min(1),
   buyerEmail: z.string().email(),
   currency: z.enum(["USD", "GBP"]),
+  country: countryZodEnum,
 });
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL!;
@@ -24,7 +26,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  const { listingId, buyerEmail, currency } = parsed.data;
+  const { listingId, buyerEmail, currency, country } = parsed.data;
 
   const listing = await prisma.listing.findFirst({
     where: { id: listingId, active: true, stripeOnboarded: true },
@@ -53,7 +55,7 @@ export async function POST(req: NextRequest) {
           currency: currency.toLowerCase() as "usd" | "gbp",
           unit_amount: listing.askPriceMinorUnit,
           product_data: {
-            name: `${pixelCount.toLocaleString()} Pixels on Pixel Estate (Resale)`,
+            name: `${pixelCount.toLocaleString()} Pixels on The Fan Wall (Resale)`,
           },
         },
         quantity: 1,
@@ -65,7 +67,9 @@ export async function POST(req: NextRequest) {
     },
     success_url: `${BASE_URL}?purchased=1`,
     cancel_url: `${BASE_URL}?cancelled=1`,
-    metadata: { listingId, buyerEmail },
+    // country rides in metadata: unlike initial purchase there's no PENDING block
+    // to carry the new buyer's nation, so the Connect webhook reads it from here.
+    metadata: { listingId, buyerEmail, country },
   });
 
   // Reserve listing for this buyer

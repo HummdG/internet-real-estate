@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "*.pixelestate.com",
+        hostname: "*.thefanwall.com",
       },
     ],
   },

@@ -23,10 +23,10 @@ const PixelGrid = dynamic(() => import("./PixelGrid"), {
   ),
 });
 
-export default function PixelGridClient() {
+export default function PixelGridClient({ highlightCountry }: { highlightCountry?: string | null }) {
   return (
     <div style={{ width: "100%", height: "100%" }}>
-      <PixelGrid />
+      <PixelGrid highlightCountry={highlightCountry} />
     </div>
   );
 }

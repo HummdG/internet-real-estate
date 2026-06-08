@@ -20,4 +20,4 @@ export const resend = new Proxy({} as Resend, {
   },
 });
 
-export const FROM_ADDRESS = "Pixel Estate <noreply@pixelestate.com>";
+export const FROM_ADDRESS = "The Fan Wall <noreply@thefanwall.com>";

@@ -1,4 +1,5 @@
 export const GRID_SIZE = 1000;
+export const TOTAL_PIXELS = GRID_SIZE * GRID_SIZE; // 1,000,000
 export const PIXEL_PRICE_USD_CENTS = 100; // $1.00
 export const PIXEL_PRICE_GBP_PENCE = 100; // £1.00
 

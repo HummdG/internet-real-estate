@@ -43,6 +43,8 @@ model PixelBlock {
   stripeConnectAccountId String?
   currency               Currency
   priceMinorUnit         Int
+  country                String?     // FIFA tri-code of the current owner's nation (see lib/countries.ts)
+  paintedPixelCount      Int?        // pixels actually painted/paid-for; drives the loyalty leaderboard
   purchasedAt            DateTime?
   createdAt              DateTime    @default(now())
   updatedAt              DateTime    @updatedAt
@@ -52,6 +54,7 @@ model PixelBlock {
 
   @@index([status])
   @@index([editToken])
+  @@index([country])
 }
 
 model Listing {
@@ -81,10 +84,12 @@ model Transaction {
   amountMinorUnit       Int
   platformFeeMinorUnit  Int?
   currency              Currency
+  country               String?    // buyer's nation at purchase time; immutable spend/fan attribution
   stripePaymentIntentId String?
   completedAt           DateTime   @default(now())
 
   @@index([pixelBlockId])
+  @@index([country])
 }
 
 model AuditLog {

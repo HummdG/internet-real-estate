@@ -1,66 +1,251 @@
 @import "tailwindcss";
 
-:root {
-  --bg: #ffffff;
-  --fg: #000000;
-  --accent: #0055ff;
-  --accent-dim: #0033aa;
-  --muted: #e0e0e0;
-  --muted-fg: #666666;
-  --border: #e5e5e5;
-  --font-mono: "IBM Plex Mono", monospace;
-  --font-body: "DM Sans", sans-serif;
+/* ============================================================
+   THE FAN WALL: "floodlit matchday broadcast" design system
+   Light = day match · Dark = night match under floodlights
+   ============================================================ */
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #e7f0e8;
+  --bg-2: #f2f8f2;
+  --surface: #ffffff;
+  --fg: #07160d;
+  --fg-soft: #2c4135;
+  --pitch: #128a47;
+  --pitch-deep: #0b5e30;
+  --gold: #b9860b;
+  --gold-bright: #e0a400;
+  --accent: #128a47;
+  --accent-dim: #0b5e30;
+  --accent-fg: #ffffff;
+  --muted: #dde7df;
+  --muted-fg: #586b5f;
+  --border: #d3ded5;
+  --chalk: #ffffff;
+  --led: #e23b22;
+  --flood-warm: rgba(255, 244, 214, 0.85);
+  --stripe-a: rgba(18, 138, 71, 0.05);
+  --stripe-b: rgba(18, 138, 71, 0.10);
+  --scanline-color: rgba(0, 0, 0, 0.02);
+  --grain-opacity: 0.045;
+  --font-display: "Anton", "Hanken Grotesk", sans-serif;
+  --font-body: "Hanken Grotesk", sans-serif;
+  --font-mono: "DM Mono", "IBM Plex Mono", monospace;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #06130d;
+  --bg-2: #0a1f15;
+  --surface: #0e2a1c;
+  --fg: #e9fff4;
+  --fg-soft: #b6d8c6;
+  --pitch: #2fe089;
+  --pitch-deep: #0c8f4c;
+  --gold: #ffd34d;
+  --gold-bright: #ffe07a;
+  --accent: #2fe089;
+  --accent-dim: #0c8f4c;
+  --accent-fg: #04160c;
+  --muted: #16291f;
+  --muted-fg: #82a594;
+  --border: #1c3528;
+  --chalk: #e9fff4;
+  --led: #ff5a3c;
+  --flood-warm: rgba(214, 240, 255, 0.16);
+  --stripe-a: rgba(255, 255, 255, 0.012);
+  --stripe-b: rgba(47, 224, 137, 0.05);
+  --scanline-color: rgba(255, 255, 255, 0.02);
+  --grain-opacity: 0.07;
 }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Subtle scanline texture */
-body::before {
+/* Global film grain: depth without flatness */
+body::after {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.015) 2px,
-    rgba(0, 0, 0, 0.015) 4px
-  );
+  z-index: 9998;
   pointer-events: none;
-  z-index: 9999;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+/* ---------- Display + utility type ---------- */
+.font-display { font-family: var(--font-display); font-weight: 400; letter-spacing: 0.01em; }
+.uppercase-wide { text-transform: uppercase; letter-spacing: 0.18em; }
+
+/* ---------- Pitch stripes (mowed grass) ---------- */
+.pitch-stripes {
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--stripe-a) 0,
+    var(--stripe-a) 56px,
+    var(--stripe-b) 56px,
+    var(--stripe-b) 112px
+  );
 }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+/* ---------- Floodlight cones ---------- */
+.flood {
+  position: absolute;
+  top: -40%;
+  width: 60%;
+  height: 150%;
+  pointer-events: none;
+  filter: blur(34px);
+  animation: floodFlicker 7s ease-in-out infinite;
+}
+.flood-l { left: -18%; background: radial-gradient(closest-side at 60% 30%, var(--flood-warm), transparent 70%); }
+.flood-r { right: -18%; background: radial-gradient(closest-side at 40% 30%, var(--flood-warm), transparent 70%); animation-delay: -3.5s; }
+
+/* ---------- Crowd of twinkling lights (the stands) ---------- */
+.crowd {
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 34px;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1.4px 1.4px at 10px 8px, var(--gold-bright) 99%, transparent),
+    radial-gradient(1.4px 1.4px at 26px 20px, var(--pitch) 99%, transparent),
+    radial-gradient(1.4px 1.4px at 44px 12px, #ffffff 99%, transparent),
+    radial-gradient(1.4px 1.4px at 62px 24px, var(--gold) 99%, transparent),
+    radial-gradient(1.4px 1.4px at 80px 9px, var(--pitch) 99%, transparent);
+  background-size: 96px 34px;
+  opacity: 0.55;
+  animation: crowdTwinkle 3.4s steps(2) infinite;
 }
 
-.animate-fade-up {
-  animation: fadeUp 0.6s ease forwards;
+/* ---------- LED pitchside ticker ---------- */
+.led-ticker {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #0c0c0c, #161616);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.7);
+  height: 34px;
+  display: flex;
+  align-items: center;
 }
-.animate-fade-up-1 { animation-delay: 0.1s; opacity: 0; }
-.animate-fade-up-2 { animation-delay: 0.25s; opacity: 0; }
-.animate-fade-up-3 { animation-delay: 0.4s; opacity: 0; }
-.animate-fade-up-4 { animation-delay: 0.55s; opacity: 0; }
+.led-track {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  will-change: transform;
+  animation: ledScroll 26s linear infinite;
+}
+.led-ticker:hover .led-track { animation-play-state: paused; }
+.led-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 18px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ffcf3f;
+  text-shadow: 0 0 8px rgba(255, 200, 60, 0.5);
+}
+.led-item .led-dot { color: var(--led); font-size: 9px; text-shadow: 0 0 8px var(--led); }
 
-.cursor-blink::after {
-  content: "_";
-  animation: blink 1s step-end infinite;
-  color: var(--accent);
+/* ---------- Jumbotron screen scanlines ---------- */
+.jumbo-scan::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.06) 2px, rgba(0, 0, 0, 0.06) 3px
+  );
+  mix-blend-mode: multiply;
+}
+
+/* ---------- Animated leaderboard bar ---------- */
+.bar-track { position: relative; overflow: hidden; }
+.bar-fill {
+  transform-origin: left center;
+  animation: barGrow 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ---------- Gold shimmer (top rank / wordmark) ---------- */
+.shimmer {
+  background: linear-gradient(100deg, var(--gold) 30%, var(--gold-bright) 50%, var(--gold) 70%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4.5s linear infinite;
+}
+
+/* ---------- Reveal on load (staggered) ---------- */
+.rise { animation: riseUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.rise-1 { animation-delay: 0.05s; }
+.rise-2 { animation-delay: 0.16s; }
+.rise-3 { animation-delay: 0.28s; }
+.rise-4 { animation-delay: 0.4s; }
+.rise-5 { animation-delay: 0.52s; }
+
+/* ---------- Floating bob ---------- */
+.float { animation: floatBob 4.5s ease-in-out infinite; }
+
+/* ---------- Live dot ---------- */
+.live-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  animation: livePulse 1.8s ease-out infinite;
+}
+
+/* ---------- Confetti (one-shot on arrival) ---------- */
+.confetti { position: absolute; top: -10px; width: 7px; height: 12px; opacity: 0; border-radius: 1px; animation: confettiFall 2.6s ease-in forwards; }
+
+/* ---------- Buttons ---------- */
+.btn-pop { transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease; }
+.btn-pop:hover { transform: translateY(-1px); filter: brightness(1.06); }
+.btn-pop:active { transform: translateY(1px) scale(0.98); }
+
+/* ---------- Hover lift for leaderboard rows ---------- */
+.row-lift { transition: background 0.15s ease, transform 0.12s ease, border-color 0.15s ease; }
+.row-lift:hover { transform: translateX(2px); }
+
+/* ============================ keyframes ============================ */
+@keyframes ledScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes floodFlicker { 0%, 100% { opacity: 0.82; } 45% { opacity: 1; } 70% { opacity: 0.74; } 88% { opacity: 0.95; } }
+@keyframes crowdTwinkle { 0% { opacity: 0.4; } 100% { opacity: 0.7; } }
+@keyframes barGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@keyframes riseUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes floatBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes livePulse {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+  70% { box-shadow: 0 0 0 7px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+@keyframes confettiFall {
+  0% { opacity: 0; transform: translateY(-10px) rotate(0deg); }
+  10% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(420px) rotate(680deg); }
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+@media (max-width: 640px) { .hide-sm { display: none !important; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }

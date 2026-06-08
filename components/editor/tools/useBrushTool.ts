@@ -51,7 +51,7 @@ export function useBrushTool(
 ) {
   const lastPos = useRef<{ x: number; y: number } | null>(null);
   const strokeSnapshot = useRef<ImageData | null>(null);
-  // Mutable working buffer for the current stroke — avoids stale React state closures
+  // Mutable working buffer for the current stroke, avoids stale React state closures
   const workingBuffer = useRef<ImageData | null>(null);
 
   const startStroke = useCallback(

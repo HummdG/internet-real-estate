@@ -1,22 +1,10 @@
-import PixelGridClient from "@/components/grid/PixelGridClient";
-
-const TOTAL_PIXELS = 1_000_000;
-const PIXELS_SOLD = 0;
-const PIXELS_REMAINING = TOTAL_PIXELS - PIXELS_SOLD;
-const pct = ((PIXELS_SOLD / TOTAL_PIXELS) * 100).toFixed(2);
+import FanWallBoard from "@/components/home/FanWallBoard";
+import ThemeToggle from "@/components/ThemeToggle";
+import StadiumTicker from "@/components/decor/StadiumTicker";
 
 export default function Home() {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        background: "var(--bg)",
-        color: "var(--fg)",
-        fontFamily: "var(--font-body)",
-      }}
-    >
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg)", color: "var(--fg)", fontFamily: "var(--font-body)" }}>
       {/* STICKY HEADER */}
       <header
         style={{
@@ -25,275 +13,115 @@ export default function Home() {
           zIndex: 100,
           flexShrink: 0,
           borderBottom: "1px solid var(--border)",
-          background: "rgba(255,255,255,0.97)",
-          backdropFilter: "blur(8px)",
-          padding: "0 24px",
-          height: 52,
+          background: "color-mix(in srgb, var(--bg) 88%, transparent)",
+          backdropFilter: "blur(10px)",
+          padding: "0 22px",
+          height: 58,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
         }}
       >
-        <div
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontWeight: 700,
-            fontSize: 14,
-            letterSpacing: "0.18em",
-            color: "#000",
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
-          <span
-            style={{
-              display: "inline-block",
-              width: 8,
-              height: 8,
-              background: "var(--accent)",
-            }}
-          />
-          PIXEL ESTATE
-          <span
-            style={{
-              fontWeight: 400,
-              fontSize: 11,
-              letterSpacing: "0.08em",
-              color: "#999",
-              marginLeft: 12,
-              paddingLeft: 12,
-              borderLeft: "1px solid #e0e0e0",
-            }}
-          >
-            Own a piece of the internet.
+        <a href="#top" style={{ display: "flex", alignItems: "center", gap: 11, textDecoration: "none" }}>
+          <span className="float" style={{ fontSize: 20, lineHeight: 1, filter: "drop-shadow(0 0 10px var(--flood-warm))" }}>🏟️</span>
+          <span style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+            <span className="font-display" style={{ fontSize: 24, letterSpacing: "0.02em", color: "var(--fg)", lineHeight: 1 }}>
+              THE <span className="shimmer">FAN WALL</span>
+            </span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.14em", color: "var(--muted-fg)", textTransform: "uppercase" }} className="hide-sm">
+              · every pixel a vote
+            </span>
           </span>
-        </div>
-        <nav style={{ display: "flex", alignItems: "center", gap: 24 }}>
-          <a href="#how" style={navLinkStyle}>How It Works</a>
+        </a>
+        <nav style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <a href="#rules" style={navLinkStyle}>Match Rules</a>
+          <ThemeToggle />
           <a
             href="#grid"
+            className="btn-pop"
             style={{
               fontFamily: "var(--font-mono)",
               fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: "0.1em",
-              color: "#fff",
+              fontWeight: 500,
+              letterSpacing: "0.12em",
+              color: "var(--accent-fg)",
               background: "var(--accent)",
-              padding: "7px 18px",
+              padding: "9px 18px",
               textDecoration: "none",
               textTransform: "uppercase" as const,
+              boxShadow: "0 4px 18px color-mix(in srgb, var(--accent) 45%, transparent)",
             }}
           >
-            Buy Pixels
+            Fly Your Flag ▸
           </a>
         </nav>
       </header>
 
-      {/* INSTRUCTION BAR */}
-      <div
-        style={{
-          flexShrink: 0,
-          height: 44,
-          borderBottom: "1px solid var(--border)",
-          background: "#fafafa",
-          padding: "0 12px 0 8px",
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-        }}
-      >
-        {/* Left: mode controls (portalled from PixelGrid) */}
-        <div id="grid-controls-bar" style={{ display: "flex", alignItems: "center", gap: 2, flexShrink: 0 }} />
+      {/* LED PITCHSIDE TICKER */}
+      <StadiumTicker />
 
-        {/* Center: selection info or hint text (portalled from PixelGrid) */}
-        <div id="grid-info-bar" style={{ flex: 1, display: "flex", alignItems: "center" }} />
-
-        {/* Right: zoom controls (portalled from PixelGrid) + stats */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
-          <div id="grid-zoom-bar" style={{ display: "flex", alignItems: "center", gap: 2 }} />
-          <div style={{ display: "flex", gap: 16 }}>
-            {[
-              { label: "Sold", value: PIXELS_SOLD.toLocaleString(), accent: true },
-              { label: "Remaining", value: PIXELS_REMAINING.toLocaleString() },
-              { label: "Claimed", value: `${pct}%` },
-            ].map((stat) => (
-              <div key={stat.label} style={{ display: "flex", gap: 5, alignItems: "baseline" }}>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.1em", color: "#bbb", textTransform: "uppercase" as const }}>
-                  {stat.label}
-                </span>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 700, color: stat.accent ? "var(--accent)" : "#555", letterSpacing: "-0.02em" }}>
-                  {stat.value}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* HERO LEADERBOARD + JUMBOTRON GRID (interactive) */}
+      <div id="top">
+        <FanWallBoard />
       </div>
 
-      {/* GRID */}
-      <div
-        id="grid"
-        style={{
-          flexShrink: 0,
-          padding: "28px 24px 20px",
-          background: "#0a0a0a",
-          borderTop: "1px solid #1a1a1a",
-          borderBottom: "1px solid #1a1a1a",
-          position: "relative",
-        }}
-      >
-        {/* Corner labels */}
-        <div style={{
-          position: "absolute",
-          top: 8,
-          left: 24,
-          fontFamily: "var(--font-mono)",
-          fontSize: 9,
-          letterSpacing: "0.2em",
-          color: "#666",
-          textTransform: "uppercase",
-          pointerEvents: "none",
-        }}>
-          1000 × 1000 PIXEL CANVAS
-        </div>
-        <div style={{
-          position: "absolute",
-          top: 8,
-          right: 24,
-          fontFamily: "var(--font-mono)",
-          fontSize: 9,
-          letterSpacing: "0.12em",
-          color: "#666",
-          pointerEvents: "none",
-        }}>
-          LIVE
-          <span style={{
-            display: "inline-block",
-            width: 5,
-            height: 5,
-            borderRadius: "50%",
-            background: "#22c55e",
-            marginLeft: 5,
-            verticalAlign: "middle",
-            boxShadow: "0 0 6px #22c55e",
-          }} />
-        </div>
-
-        <div
-          style={{
-            height: "calc(100vh - 52px - 44px - 48px)",
-            width: "100%",
-            position: "relative",
-            border: "1px solid #2a2a2a",
-            boxShadow: "0 0 0 1px #111, inset 0 0 40px rgba(0,0,0,0.4), 0 8px 40px rgba(0,0,0,0.6)",
-            background: "#fff",
-            outline: "3px solid var(--accent)",
-            outlineOffset: "-1px",
-          }}
-        >
-          <PixelGridClient />
-        </div>
-      </div>
-
-      {/* HOW IT WORKS */}
+      {/* MATCH RULES */}
       <section
-        id="how"
-        style={{
-          padding: "64px 24px",
-          borderTop: "1px solid var(--border)",
-          background: "#f8f8f8",
-        }}
+        id="rules"
+        className="pitch-stripes"
+        style={{ padding: "72px 24px", borderTop: "1px solid var(--border)", background: "var(--bg-2)", position: "relative" }}
       >
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 10,
-              letterSpacing: "0.2em",
-              color: "var(--accent)",
-              textTransform: "uppercase" as const,
-              marginBottom: 12,
-            }}
-          >
-            How it works
+        <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 8 }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.22em", color: "var(--pitch)", textTransform: "uppercase" }}>
+              ⚽ How to play
+            </span>
           </div>
-          <h2
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "clamp(22px, 3vw, 36px)",
-              fontWeight: 700,
-              marginBottom: 48,
-              letterSpacing: "-0.02em",
-              color: "#000",
-            }}
-          >
-            Four steps to own internet real estate
+          <h2 className="font-display" style={{ fontSize: "clamp(34px, 6vw, 68px)", lineHeight: 0.95, marginBottom: 44, color: "var(--fg)", textTransform: "uppercase" }}>
+            Put your nation <span className="shimmer">on the wall</span>
           </h2>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-              gap: 2,
-            }}
-          >
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(232px, 1fr))", gap: 14 }}>
             {[
-              {
-                step: "01",
-                title: "Paint your pixels",
-                body: "Drag across the grid to select any region. Each pixel costs $1. Select scattered pixels or solid blocks.",
-              },
-              {
-                step: "02",
-                title: "Pay and claim",
-                body: "Pay via Stripe. You'll receive a permanent edit link by email. No account needed. That link is yours forever.",
-              },
-              {
-                step: "03",
-                title: "Paint your space",
-                body: "Use the pixel editor to paint, fill, or import your logo. Once you save, your art appears live on the grid.",
-              },
-              {
-                step: "04",
-                title: "Trade on the marketplace",
-                body: "Your pixels are yours to keep or sell. List them at any price. We take 2%, you keep the rest.",
-              },
-            ].map((s) => (
+              { step: "01", title: "Pick your nation", body: "Choose who you rep from all 48 World Cup sides, then drag across the wall to grab your pixels, $1 each." },
+              { step: "02", title: "Pay & claim", body: "Checkout with Stripe. A permanent edit link lands in your inbox, no account, no password. It's yours forever." },
+              { step: "03", title: "Paint your patch", body: "Open the editor and paint your crest, flag or message pixel by pixel. Save it and it's live on the wall instantly." },
+              { step: "04", title: "Top the table", body: "Every pixel counts toward your nation's tally. Resell on the marketplace anytime, we take 2%, you keep the rest." },
+            ].map((s, i) => (
               <div
                 key={s.step}
+                className="rise"
                 style={{
-                  padding: "28px 24px",
-                  background: "#fff",
+                  position: "relative",
+                  padding: "26px 24px 28px",
+                  background: "var(--surface)",
                   border: "1px solid var(--border)",
+                  borderTop: "3px solid var(--pitch)",
+                  overflow: "hidden",
+                  animationDelay: `${0.08 * i}s`,
                 }}
               >
-                <div
+                <span
+                  className="font-display"
                   style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: "var(--accent)",
-                    marginBottom: 14,
-                    letterSpacing: "0.1em",
+                    position: "absolute",
+                    top: -14,
+                    right: 6,
+                    fontSize: 92,
+                    lineHeight: 1,
+                    color: "transparent",
+                    WebkitTextStroke: "1.5px color-mix(in srgb, var(--pitch) 30%, transparent)",
+                    pointerEvents: "none",
                   }}
                 >
                   {s.step}
+                </span>
+                <div className="font-display" style={{ fontSize: 22, color: "var(--gold)", marginBottom: 12, letterSpacing: "0.04em" }}>
+                  {s.step}
                 </div>
-                <h3
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 14,
-                    fontWeight: 600,
-                    marginBottom: 10,
-                    letterSpacing: "-0.01em",
-                    color: "#000",
-                  }}
-                >
+                <h3 style={{ fontFamily: "var(--font-body)", fontSize: 17, fontWeight: 700, marginBottom: 9, color: "var(--fg)", position: "relative" }}>
                   {s.title}
                 </h3>
-                <p style={{ fontSize: 13, fontWeight: 300, color: "#888", lineHeight: 1.65 }}>
-                  {s.body}
-                </p>
+                <p style={{ fontSize: 13.5, color: "var(--muted-fg)", lineHeight: 1.6, position: "relative" }}>{s.body}</p>
               </div>
             ))}
           </div>
@@ -301,27 +129,17 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer style={{ borderTop: "1px solid var(--border)", padding: "24px", background: "#f0f0f0" }}>
-        <div
-          style={{
-            maxWidth: 1100,
-            margin: "0 auto",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 16,
-            flexWrap: "wrap" as const,
-          }}
-        >
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", color: "#000" }}>
-            PIXEL ESTATE
+      <footer style={{ borderTop: "1px solid var(--border)", padding: "28px 24px", background: "var(--surface)" }}>
+        <div style={{ maxWidth: 1120, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" as const }}>
+          <div className="font-display" style={{ fontSize: 18, letterSpacing: "0.04em", color: "var(--fg)" }}>
+            🏟️ THE <span className="shimmer">FAN WALL</span>
           </div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "#aaa", letterSpacing: "0.08em" }}>
-            Inspired by the Million Dollar Homepage (2005) by Alex Tew.
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--muted-fg)", letterSpacing: "0.06em" }}>
+            A fan-loyalty experiment · inspired by the Million Dollar Homepage (2005)
           </div>
-          <div style={{ display: "flex", gap: 24 }}>
+          <div style={{ display: "flex", gap: 20 }}>
             {["X / Twitter", "Reddit", "LinkedIn"].map((name) => (
-              <span key={name} style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#aaa", letterSpacing: "0.1em", textTransform: "uppercase" as const }}>
+              <span key={name} style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--muted-fg)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
                 {name}
               </span>
             ))}
@@ -335,8 +153,8 @@ export default function Home() {
 const navLinkStyle: React.CSSProperties = {
   fontFamily: "var(--font-mono)",
   fontSize: 11,
-  letterSpacing: "0.12em",
-  color: "#888",
+  letterSpacing: "0.1em",
+  color: "var(--muted-fg)",
   textDecoration: "none",
   textTransform: "uppercase",
 };

@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      await prisma.pixelBlock.update({
+      const activatedBlock = await prisma.pixelBlock.update({
         where: { id: blockId, editToken },
         data: {
           status: "ACTIVE",
@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
           buyerEmail: session.customer_email ?? session.customer_details?.email ?? "",
           amountMinorUnit: session.amount_total ?? 0,
           currency: (session.currency?.toUpperCase() as "USD" | "GBP") ?? "USD",
+          country: activatedBlock.country, // immutable attribution for spend/fan leaderboards
           stripePaymentIntentId: session.payment_intent as string,
         },
       });
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
       // Exclusion constraint violation means another block already claimed these pixels
       const code = (err as { code?: string }).code;
       if (code === "P2002" || code === "P2034") {
-        console.error("Pixel overlap on activation — issuing refund", blockId);
+        console.error("Pixel overlap on activation, issuing refund", blockId);
         await prisma.auditLog.create({
           data: { event: "pixel_overlap_refund", payload: { blockId, sessionId: session.id } },
         });
@@ -85,7 +86,7 @@ export async function POST(req: NextRequest) {
             console.error("Refund failed:", refundErr);
           }
         }
-        // Optionally: send apology email (omitted for now — add later)
+        // Optionally: send apology email (omitted for now, add later)
       } else {
         throw err;
       }

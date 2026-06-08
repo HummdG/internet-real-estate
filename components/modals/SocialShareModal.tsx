@@ -5,10 +5,10 @@ interface Props {
   onEdit: () => void;
 }
 
-const BASE_URL = typeof window !== "undefined" ? window.location.origin : "https://pixelestate.com";
+const BASE_URL = typeof window !== "undefined" ? window.location.origin : "https://thefanwall.com";
 
 export default function SocialShareModal({ onClose, onEdit }: Props) {
-  const message = `I just claimed my piece of the internet on Pixel Estate! 🎨 Own 1 pixel or 10,000. It's yours forever. ${BASE_URL}`;
+  const message = `I just claimed my pixels on The Fan Wall 🏟️, every pixel a vote for my nation. Fly your flag too: ${BASE_URL}`;
   const encodedMsg = encodeURIComponent(message);
   const encodedUrl = encodeURIComponent(BASE_URL);
 
@@ -23,13 +23,13 @@ export default function SocialShareModal({ onClose, onEdit }: Props) {
       name: "Reddit",
       color: "#ff4500",
       textColor: "#fff",
-      href: `https://reddit.com/submit?url=${encodedUrl}&title=${encodeURIComponent("I just claimed pixels on Pixel Estate!")}`,
+      href: `https://reddit.com/submit?url=${encodedUrl}&title=${encodeURIComponent("I just claimed pixels on The Fan Wall!")}`,
     },
     {
       name: "LinkedIn",
       color: "#0077b5",
       textColor: "#fff",
-      href: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodeURIComponent("Pixel Estate")}&summary=${encodedMsg}`,
+      href: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodeURIComponent("The Fan Wall")}&summary=${encodedMsg}`,
     },
     {
       name: "Facebook",

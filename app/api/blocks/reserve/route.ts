@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { GRID_SIZE, PIXEL_PRICE_USD_CENTS, PIXEL_PRICE_GBP_PENCE } from "@/lib/grid/constants";
+import { countryZodEnum } from "@/lib/countries";
 
 const schema = z.object({
   x: z.number().int().min(0).max(GRID_SIZE - 1),
@@ -10,6 +11,7 @@ const schema = z.object({
   height: z.number().int().min(1),
   currency: z.enum(["USD", "GBP"]),
   paintedPixelCount: z.number().int().min(1).optional(),
+  country: countryZodEnum,
 });
 
 export async function POST(req: NextRequest) {
@@ -25,7 +27,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request", details: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { x, y, width, height, currency, paintedPixelCount } = parsed.data;
+  const { x, y, width, height, currency, paintedPixelCount, country } = parsed.data;
 
   // Bounds check
   if (x + width > GRID_SIZE || y + height > GRID_SIZE) {
@@ -49,6 +51,8 @@ export async function POST(req: NextRequest) {
         ownerEmail: "", // set on webhook
         currency,
         priceMinorUnit,
+        country,
+        paintedPixelCount: billablePixels,
         status: "PENDING_PAYMENT",
       },
       select: { id: true },

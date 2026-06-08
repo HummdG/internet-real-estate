@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { BlockMeta } from "@/lib/grid/blockIndex";
 import { formatPrice } from "@/lib/currency";
+import { getCountry } from "@/lib/countries";
+import CountryPicker from "@/components/CountryPicker";
 
 interface Props {
   block: BlockMeta;
@@ -11,15 +13,23 @@ interface Props {
 
 export default function BlockInfoModal({ block, onClose }: Props) {
   const [buyEmail, setBuyEmail] = useState("");
+  const [buyCountry, setBuyCountry] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const pixelCount = block.width * block.height;
+  const blockCountry = getCountry(block.country);
 
   async function handleBuy(e: React.FormEvent) {
     e.preventDefault();
     if (!block.listingPrice) return;
     setError("");
+
+    if (!buyCountry) {
+      setError("Pick the nation you're repping before buying.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -30,6 +40,7 @@ export default function BlockInfoModal({ block, onClose }: Props) {
           listingId: block.id,
           buyerEmail: buyEmail,
           currency: block.listingCurrency ?? "USD",
+          country: buyCountry,
         }),
       });
       const data = await res.json();
@@ -62,9 +73,10 @@ export default function BlockInfoModal({ block, onClose }: Props) {
     >
       <div
         style={{
-          background: "#fff",
+          background: "var(--bg)",
+          color: "var(--fg)",
           border: "1px solid var(--border)",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.12)",
+          boxShadow: "0 8px 40px rgba(0,0,0,0.24)",
           padding: "40px 32px",
           maxWidth: 400,
           width: "100%",
@@ -75,7 +87,7 @@ export default function BlockInfoModal({ block, onClose }: Props) {
             fontFamily: "var(--font-mono)",
             fontSize: 10,
             letterSpacing: "0.2em",
-            color: block.listed ? "rgb(255,200,0)" : "var(--accent)",
+            color: block.listed ? "var(--gold)" : "var(--pitch)",
             textTransform: "uppercase",
             marginBottom: 8,
           }}
@@ -88,17 +100,36 @@ export default function BlockInfoModal({ block, onClose }: Props) {
             fontFamily: "var(--font-mono)",
             fontSize: 18,
             fontWeight: 700,
-            marginBottom: 20,
+            marginBottom: 16,
           }}
         >
           {block.width}×{block.height} pixels ({pixelCount.toLocaleString()} px)
         </h2>
 
+        {blockCountry && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              fontFamily: "var(--font-mono)",
+              fontSize: 13,
+              marginBottom: 14,
+              padding: "8px 12px",
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <span style={{ fontSize: 18 }}>{blockCountry.flagEmoji}</span>
+            <span style={{ fontWeight: 600 }}>Repping {blockCountry.name}</span>
+          </div>
+        )}
+
         <div
           style={{
             fontFamily: "var(--font-mono)",
             fontSize: 12,
-            color: "#555",
+            color: "var(--muted-fg)",
             marginBottom: 20,
           }}
         >
@@ -112,11 +143,18 @@ export default function BlockInfoModal({ block, onClose }: Props) {
                 fontFamily: "var(--font-mono)",
                 fontSize: 24,
                 fontWeight: 700,
-                color: "rgb(255,200,0)",
+                color: "var(--gold)",
                 marginBottom: 20,
               }}
             >
               {formatPrice(block.listingPrice, (block.listingCurrency as "USD" | "GBP") ?? "USD")}
+            </div>
+
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.12em", color: "var(--muted-fg)", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
+                Your nation
+              </label>
+              <CountryPicker value={buyCountry} onChange={setBuyCountry} placeholder="Who are you repping?" />
             </div>
 
             <div style={{ marginBottom: 16 }}>
@@ -128,9 +166,9 @@ export default function BlockInfoModal({ block, onClose }: Props) {
                 placeholder="your@email.com"
                 style={{
                   width: "100%",
-                  background: "#050505",
+                  background: "var(--surface)",
                   border: "1px solid var(--border)",
-                  color: "#fff",
+                  color: "var(--fg)",
                   fontFamily: "var(--font-mono)",
                   fontSize: 13,
                   padding: "10px 14px",
@@ -164,7 +202,7 @@ export default function BlockInfoModal({ block, onClose }: Props) {
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
                   color: "#000",
-                  background: "rgb(255,200,0)",
+                  background: "var(--gold)",
                   border: "none",
                   padding: "12px",
                   cursor: loading ? "not-allowed" : "pointer",
@@ -181,7 +219,7 @@ export default function BlockInfoModal({ block, onClose }: Props) {
                   padding: "12px 16px",
                   background: "transparent",
                   border: "1px solid var(--border)",
-                  color: "#555",
+                  color: "var(--muted-fg)",
                   cursor: "pointer",
                 }}
               >
@@ -200,7 +238,7 @@ export default function BlockInfoModal({ block, onClose }: Props) {
               padding: "12px 20px",
               background: "transparent",
               border: "1px solid var(--border)",
-              color: "#555",
+              color: "var(--muted-fg)",
               cursor: "pointer",
             }}
           >

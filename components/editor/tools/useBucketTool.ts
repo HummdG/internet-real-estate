@@ -20,7 +20,7 @@ function colorsMatch(a: [number, number, number, number], b: [number, number, nu
   return a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3];
 }
 
-/** Iterative BFS flood fill — no recursion to avoid stack overflow */
+/** Iterative BFS flood fill: no recursion to avoid stack overflow */
 function floodFill(data: ImageData, startX: number, startY: number, fillColor: [number, number, number, number]) {
   const { width, height } = data;
   const startIdx = (startY * width + startX) * 4;

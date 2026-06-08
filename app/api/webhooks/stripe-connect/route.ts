@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const { listingId, buyerEmail } = session.metadata ?? {};
+    const { listingId, buyerEmail, country } = session.metadata ?? {};
 
     if (!listingId || !buyerEmail) {
       console.error("Missing metadata on connect session", session.id);
@@ -59,6 +59,9 @@ export async function POST(req: NextRequest) {
               publicSlug: newSlug,
               status: "ACTIVE",
               stripeConnectAccountId: null,
+              // Flag follows the current owner; fall back to the block's
+              // existing nation if metadata is somehow missing.
+              country: country ?? block.country,
             },
           });
 
@@ -78,6 +81,7 @@ export async function POST(req: NextRequest) {
               amountMinorUnit: listing.askPriceMinorUnit,
               platformFeeMinorUnit: platformFee,
               currency: listing.currency,
+              country: country ?? block.country,
               stripePaymentIntentId: session.payment_intent as string,
             },
           });

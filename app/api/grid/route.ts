@@ -21,6 +21,7 @@ export async function GET() {
         linkUrl: true,
         altText: true,
         status: true,
+        country: true,
         listing: {
           select: {
             askPriceMinorUnit: true,
@@ -46,6 +47,7 @@ export async function GET() {
     listed: b.status === "LISTED",
     listingPrice: b.listing?.askPriceMinorUnit,
     listingCurrency: b.listing?.currency,
+    country: b.country,
   }));
 
   return NextResponse.json({ masterImageUrl: masterUrl, blocks: blockMeta });

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { detectCurrency, formatPrice, pixelPrice, currencySymbol } from "@/lib/currency";
+import CountryPicker from "@/components/CountryPicker";
 
 interface Selection {
   x: number;
@@ -22,6 +23,7 @@ type Currency = "USD" | "GBP";
 export default function PurchaseModal({ selection, paintedPixelCount, onClose }: Props) {
   const [currency, setCurrency] = useState<Currency>("USD");
   const [email, setEmail] = useState("");
+  const [country, setCountry] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -35,6 +37,12 @@ export default function PurchaseModal({ selection, paintedPixelCount, onClose }:
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    if (!country) {
+      setError("Pick the nation you're repping before claiming.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -49,6 +57,7 @@ export default function PurchaseModal({ selection, paintedPixelCount, onClose }:
           height: selection.height,
           currency,
           paintedPixelCount,
+          country,
         }),
       });
 
@@ -98,9 +107,10 @@ export default function PurchaseModal({ selection, paintedPixelCount, onClose }:
     >
       <div
         style={{
-          background: "#fff",
+          background: "var(--bg)",
+          color: "var(--fg)",
           border: "1px solid var(--border)",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.12)",
+          boxShadow: "0 8px 40px rgba(0,0,0,0.24)",
           padding: "40px 32px",
           maxWidth: 460,
           width: "100%",
@@ -120,21 +130,22 @@ export default function PurchaseModal({ selection, paintedPixelCount, onClose }:
           Claim Your Pixels
         </div>
         <h2
+          className="font-display"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 22,
-            fontWeight: 700,
-            letterSpacing: "-0.01em",
+            fontSize: 30,
+            letterSpacing: "0.01em",
+            textTransform: "uppercase",
             marginBottom: 24,
+            color: "var(--fg)",
           }}
         >
-          {pixelCount.toLocaleString()} pixels selected
+          {pixelCount.toLocaleString()} pixels
         </h2>
 
         {/* Selection summary */}
         <div
           style={{
-            background: "#f8f8f8",
+            background: "var(--surface)",
             border: "1px solid var(--border)",
             padding: "16px 20px",
             marginBottom: 24,
@@ -159,7 +170,7 @@ export default function PurchaseModal({ selection, paintedPixelCount, onClose }:
                   fontFamily: "var(--font-mono)",
                   fontSize: 9,
                   letterSpacing: "0.15em",
-                  color: "#555",
+                  color: "var(--muted-fg)",
                   textTransform: "uppercase",
                   marginBottom: 2,
                 }}
@@ -171,7 +182,7 @@ export default function PurchaseModal({ selection, paintedPixelCount, onClose }:
                   fontFamily: "var(--font-mono)",
                   fontSize: 15,
                   fontWeight: 600,
-                  color: row.accent ? "var(--accent)" : "#fff",
+                  color: row.accent ? "var(--accent)" : "var(--fg)",
                 }}
               >
                 {row.value}
@@ -187,7 +198,7 @@ export default function PurchaseModal({ selection, paintedPixelCount, onClose }:
               fontFamily: "var(--font-mono)",
               fontSize: 10,
               letterSpacing: "0.15em",
-              color: "#555",
+              color: "var(--muted-fg)",
               textTransform: "uppercase",
               marginBottom: 8,
             }}
@@ -204,10 +215,10 @@ export default function PurchaseModal({ selection, paintedPixelCount, onClose }:
                   fontSize: 12,
                   fontWeight: 600,
                   padding: "8px 20px",
-                  background: currency === c ? "var(--accent)" : "#111",
+                  background: currency === c ? "var(--accent)" : "var(--surface)",
                   border: "1px solid",
                   borderColor: currency === c ? "var(--accent)" : "var(--border)",
-                  color: currency === c ? "#000" : "#666",
+                  color: currency === c ? "var(--accent-fg)" : "var(--muted-fg)",
                   cursor: "pointer",
                   letterSpacing: "0.08em",
                 }}
@@ -226,7 +237,35 @@ export default function PurchaseModal({ selection, paintedPixelCount, onClose }:
                 fontFamily: "var(--font-mono)",
                 fontSize: 10,
                 letterSpacing: "0.15em",
-                color: "#555",
+                color: "var(--muted-fg)",
+                textTransform: "uppercase",
+                display: "block",
+                marginBottom: 8,
+              }}
+            >
+              Your nation
+            </label>
+            <CountryPicker value={country} onChange={setCountry} placeholder="Who are you repping?" />
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 10,
+                color: "var(--muted-fg)",
+                marginTop: 6,
+                letterSpacing: "0.05em",
+              }}
+            >
+              Your pixels fly this flag on the leaderboard.
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 20 }}>
+            <label
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 10,
+                letterSpacing: "0.15em",
+                color: "var(--muted-fg)",
                 textTransform: "uppercase",
                 display: "block",
                 marginBottom: 8,
@@ -242,9 +281,9 @@ export default function PurchaseModal({ selection, paintedPixelCount, onClose }:
               placeholder="you@example.com"
               style={{
                 width: "100%",
-                background: "#f8f8f8",
+                background: "var(--surface)",
                 border: "1px solid var(--border)",
-                color: "#fff",
+                color: "var(--fg)",
                 fontFamily: "var(--font-mono)",
                 fontSize: 14,
                 padding: "12px 16px",
@@ -255,7 +294,7 @@ export default function PurchaseModal({ selection, paintedPixelCount, onClose }:
               style={{
                 fontFamily: "var(--font-mono)",
                 fontSize: 10,
-                color: "#444",
+                color: "var(--muted-fg)",
                 marginTop: 6,
                 letterSpacing: "0.05em",
               }}
@@ -284,21 +323,23 @@ export default function PurchaseModal({ selection, paintedPixelCount, onClose }:
             <button
               type="submit"
               disabled={loading}
+              className="btn-pop"
               style={{
                 flex: 1,
                 fontFamily: "var(--font-mono)",
                 fontSize: 13,
-                fontWeight: 700,
+                fontWeight: 500,
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
-                color: "#000",
-                background: loading ? "#555" : "#fff",
+                color: "var(--accent-fg)",
+                background: loading ? "var(--muted)" : "var(--accent)",
                 border: "none",
                 padding: "14px",
                 cursor: loading ? "not-allowed" : "pointer",
+                boxShadow: loading ? "none" : "0 6px 20px color-mix(in srgb, var(--accent) 40%, transparent)",
               }}
             >
-              {loading ? "Redirecting..." : `Pay ${formatPrice(total, currency)}`}
+              {loading ? "Redirecting..." : `Pay ${formatPrice(total, currency)} ▸`}
             </button>
             <button
               type="button"
@@ -309,7 +350,7 @@ export default function PurchaseModal({ selection, paintedPixelCount, onClose }:
                 padding: "14px 20px",
                 background: "transparent",
                 border: "1px solid var(--border)",
-                color: "#555",
+                color: "var(--muted-fg)",
                 cursor: "pointer",
               }}
             >
